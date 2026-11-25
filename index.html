@@ -492,17 +492,27 @@ body.modal-open{overflow:hidden}
   var st = function (m) { var e = $("#st"); if (e) e.textContent = m; };
   var show = function () { adm.style.display = "flex"; };
 
+  function gis(cb) {
+    if (window.google && google.accounts) return cb();
+    var sc = document.createElement("script"); sc.src = "https://accounts.google.com/gsi/client"; sc.async = true;
+    sc.onload = cb; sc.onerror = function () { body.innerHTML = "<p class='err'>No se pudo cargar el inicio de sesión de Google.</p>"; };
+    document.head.appendChild(sc);
+  }
   function showAuth() {
     show(); foot.innerHTML = ""; body.innerHTML = "<p class='muted'>Conectando…</p>";
     if (!configured) { body.innerHTML = "<p class='err'>Falta configurar la URL del Worker en la variable API del index.html.</p>"; return; }
     api("/api/status").then(function (s) {
-      body.innerHTML = '<div class="auth"><input id="au" placeholder="Usuario" autocomplete="username"><input id="ap" type="password" placeholder="Contraseña (mín. 8 caracteres)" autocomplete="current-password"><div class="row"><button class="btn btn--primary" data-act="login">Entrar</button>' + (s.registerOpen ? '<button class="btn btn--outline" data-act="reg">Crear cuenta</button>' : "") + '</div>' + (s.registerOpen ? '<p class="muted">Las dos primeras cuentas creadas serán las administradoras.</p>' : "") + '<p id="am" class="err"></p></div>';
+      if (!s.googleClientId) { body.innerHTML = "<p class='err'>Falta configurar GOOGLE_CLIENT_ID en el Worker.</p>"; return; }
+      body.innerHTML = '<div class="auth" style="justify-items:center;text-align:center"><p class="muted">' + (s.registerOpen ? "Las dos primeras cuentas de Google que entren serán las administradoras." : "Solo pueden entrar las cuentas administradoras.") + '</p><div id="gbtn"></div><p id="am" class="err"></p></div>';
+      gis(function () {
+        google.accounts.id.initialize({ client_id: s.googleClientId, callback: function (r) {
+          api("/api/google", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ credential: r.credential }) })
+            .then(function (j) { tok = j.token; localStorage.setItem("bb_tok", tok); openPanel(); })
+            .catch(function (e) { $("#am").textContent = e.message; });
+        } });
+        google.accounts.id.renderButton($("#gbtn"), { theme: "outline", size: "large", text: "signin_with", locale: "es" });
+      });
     }).catch(function () { body.innerHTML = "<p class='err'>No se pudo conectar con el servidor.</p>"; });
-  }
-  function doAuth(path) {
-    api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: $("#au").value, password: $("#ap").value }) })
-      .then(function (j) { tok = j.token; localStorage.setItem("bb_tok", tok); openPanel(); })
-      .catch(function (e) { $("#am").textContent = e.message; });
   }
   function openPanel() {
     W = JSON.parse(JSON.stringify(DATA)); S = { tab: "rooms", i: 0, ed: null }; show();
@@ -560,7 +570,6 @@ body.modal-open{overflow:hidden}
     if (t.dataset.tab) { S.tab = t.dataset.tab; S.ed = null; return P(); }
     if (t.dataset.ed) { S.ed = t.dataset.ed; return P(); }
     if (a === "close") adm.style.display = "none";
-    else if (a === "login") doAuth("/api/login"); else if (a === "reg") doAuth("/api/register");
     else if (a === "prev" || a === "next") { S.i = (S.i + (a === "next" ? 1 : -1) + n) % n; S.ed = null; P(); }
     else if (a === "addroom") { W.rooms.push({ id: "r" + Date.now().toString(36), name: "Nueva habitación", desc: "Descripción de la habitación.", price: 50, discount: 0, features: ["2 personas"], img: "" }); S.i = W.rooms.length - 1; S.ed = null; P(); }
     else if (a === "delroom") { if (confirm("¿Eliminar esta habitación?")) { W.rooms.splice(S.i, 1); S.i = Math.max(0, S.i - 1); S.ed = null; P(); } }
