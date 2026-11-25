@@ -164,7 +164,7 @@ footer{background:var(--secondary);color:rgba(255,255,255,.6);padding:80px 0 30p
 
 /* ===== MENÚ DE FOTOS (Reservar) ===== */
 body.modal-open{overflow:hidden}
-.modal{position:fixed;inset:0;z-index:250;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.modal{position:fixed;inset:0;z-index:350;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
 .modal.is-open{opacity:1;visibility:visible}
 .modal__backdrop{position:absolute;inset:0;background:rgba(15,23,31,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .modal__content{position:relative;z-index:1;background:var(--white);border-radius:var(--radius);width:100%;max-width:1050px;max-height:92vh;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,1fr);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35);transform:scale(.95) translateY(20px);transition:transform .4s cubic-bezier(.2,.8,.3,1)}
@@ -456,8 +456,8 @@ body.modal-open{overflow:hidden}
     im.onload = done; im.onerror = done; im.src = u;
     [].forEach.call(mTh.children, function (t, k) { t.classList.toggle("is-active", k === mI); });
   }
-  function mOpen(id) {
-    var r = DATA.rooms.filter(function (x) { return x.id === id; })[0]; if (!r) return;
+  function mOpen(id, room) {
+    var r = room || DATA.rooms.filter(function (x) { return x.id === id; })[0]; if (!r) return;
     mCur = mList(r); if (!mCur.length) return;
     var f = fin(r);
     $("#mTitle").textContent = r.name;
@@ -476,7 +476,7 @@ body.modal-open{overflow:hidden}
     if (mLast && mLast.focus) mLast.focus();
   }
   document.addEventListener("click", function (e) {
-    var b = e.target.closest(".reserve-btn"); if (b && !b.closest("#adm")) mOpen(b.dataset.room);
+    var b = e.target.closest(".reserve-btn"); if (b) { if (b.closest("#adm")) mOpen(null, W.rooms[S.i]); else mOpen(b.dataset.room); }
     if (e.target.closest("[data-close]") && M.contains(e.target)) mClose();
     var t = e.target.closest("#mThumbs img"); if (t) mGo(+t.dataset.k);
   });
