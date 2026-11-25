@@ -63,7 +63,10 @@ img{max-width:100%;display:block}a{color:inherit;text-decoration:none}button,inp
 .feature-item h3{font-family:var(--font-serif);font-size:1.2rem;font-weight:600;color:var(--secondary);margin-bottom:10px}
 .feature-item p{font-size:.9rem;color:var(--muted);font-weight:300}
 .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
-.about-img{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);height:550px;background:url('https://i.postimg.cc/wBRGqJGG/imagen.png') center/cover no-repeat}
+.brick-wall{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:130px;gap:6px;padding:6px;background:#d9cfc0;border-radius:var(--radius);box-shadow:var(--shadow)}
+.brick{overflow:hidden;border-radius:3px;background:#ccc;min-width:0}
+.brick img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.brick:hover img{transform:scale(1.08)}
 .about-content h2{margin-bottom:30px}
 .about-content p{color:var(--muted);margin-bottom:20px;font-size:1.05rem;font-weight:300;line-height:1.8}
 .rooms-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;margin-top:60px}
@@ -197,7 +200,7 @@ body.modal-open{overflow:hidden}
 @media (max-width:600px){.modal{padding:10px}}
 
 @media (max-width:1200px){.rooms-grid{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:1024px){.features__grid{grid-template-columns:repeat(2,1fr);gap:40px}.about-grid{grid-template-columns:1fr;gap:50px}.about-img{height:400px}.contact-grid{grid-template-columns:1fr;gap:50px}.footer-grid{grid-template-columns:1fr 1fr;gap:40px}}
+@media (max-width:1024px){.features__grid{grid-template-columns:repeat(2,1fr);gap:40px}.about-grid{grid-template-columns:1fr;gap:50px}.contact-grid{grid-template-columns:1fr;gap:50px}.footer-grid{grid-template-columns:1fr 1fr;gap:40px}}
 @media (max-width:900px){.rooms-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:860px){
 .nav__links{position:fixed;top:70px;left:20px;right:20px;flex-direction:column;gap:15px;background:var(--white);padding:30px;border-radius:var(--radius);box-shadow:var(--shadow-lg);opacity:0;transform:translateY(-20px);pointer-events:none;transition:all .3s;border:1px solid rgba(0,0,0,.05)}
@@ -205,7 +208,7 @@ body.modal-open{overflow:hidden}
 .nav__links a{color:var(--secondary);width:100%;text-align:center;font-size:1rem}.nav__links a::after{display:none}
 .burger{display:flex}.nav__actions .btn{display:none}
 .gallery-grid{grid-template-columns:1fr 1fr;grid-auto-rows:200px}.gallery-item:nth-child(n){grid-column:span 2;grid-row:span 1}}
-@media (max-width:600px){.section{padding:80px 0}.features__grid{grid-template-columns:1fr;padding:30px}.hero{min-height:auto;padding:150px 0 100px}.hero h1{font-size:2.8rem}.footer-grid{grid-template-columns:1fr}.contact-form{padding:30px 20px}.gallery-grid{grid-template-columns:1fr}.gallery-item:nth-child(n){grid-column:span 1!important}.review-card{padding:35px 20px}.rooms-grid{grid-template-columns:1fr}#adm .grow{grid-template-columns:50px 1fr auto}#adm .grow .danger{grid-column:2}}
+@media (max-width:600px){.section{padding:80px 0}.features__grid{grid-template-columns:1fr;padding:30px}.hero{min-height:auto;padding:150px 0 100px}.hero h1{font-size:2.8rem}.footer-grid{grid-template-columns:1fr}.contact-form{padding:30px 20px}.gallery-grid{grid-template-columns:1fr}.gallery-item:nth-child(n){grid-column:span 1!important}.review-card{padding:35px 20px}.rooms-grid{grid-template-columns:1fr}.brick-wall{grid-auto-rows:80px;gap:4px;padding:4px}#adm .grow{grid-template-columns:50px 1fr auto}#adm .grow .danger{grid-column:2}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}.reveal{opacity:1!important;transform:none!important}}
 </style>
 </head>
@@ -247,7 +250,7 @@ body.modal-open{overflow:hidden}
   <section class="section" id="nosotros">
     <div class="container">
       <div class="about-grid">
-        <div class="about-img reveal"></div>
+        <div class="brick-wall reveal" id="aboutWall"></div>
         <div class="about-content reveal">
           <span class="eyebrow">Sobre Nosotros</span>
           <h2 class="section-title">Bungalows Beach: ¡El paraíso es aquí!</h2>
@@ -370,7 +373,7 @@ body.modal-open{overflow:hidden}
 </div>
 
 <!-- DATOS DEL SITIO: el Worker reescribe solo el contenido de esta etiqueta -->
-<script type="application/json" id="site-data">{"rooms":[{"id":"coral","name":"Bungalow Coral","desc":"Acogedor bungalow con vista al jardín, ideal para parejas que buscan tranquilidad.","price":60,"discount":0,"features":["2 personas","1 cama","A/C"],"img":"https://placehold.co/600x400/2B1B4D/FFFFFF?text=Bungalow+Coral"},{"id":"aloha","name":"Bungalow Aloha","desc":"Espacioso bungalow, perfecto para desconectar.","price":60,"discount":0,"features":["2-3 personas","A/C"],"img":"https://i.postimg.cc/2S70s9S0/imagen.png"},{"id":"costanera","name":"Cabaña Costanera","desc":"Cabaña de madera con amplios ventanales y vista parcial al mar. Muy luminosa.","price":110,"discount":0,"features":["4 personas","3 camas","Vista al mar"],"img":"https://i.postimg.cc/FKrd8LP7/imagen.png"},{"id":"costasol","name":"Cabaña Costasol","desc":"La cabaña más soleada del complejo, con acceso directo a la zona de piscina.","price":200,"discount":0,"features":["7 personas","Piscina","Cocina"],"img":"https://i.postimg.cc/mgY0C7wC/imagen.png"},{"id":"pacifico","name":"Habitación Pacífico","desc":"Habitación confortable con cama matrimonial y baño privado. Excelente relación calidad-precio.","price":90,"discount":0,"features":["4 personas","2 camas","Baño privado"],"img":"https://placehold.co/600x400/1E3A8A/FFFFFF?text=Habitación+Pacífico"},{"id":"atlantico","name":"Habitación Atlántico","desc":"Habitación luminosa con dos camas individuales, ideal para amigos o compañeros de viaje.","price":90,"discount":0,"features":["4 personas","2 camas","A/C"],"img":"https://i.postimg.cc/d0wShwB4/imagen.png"},{"id":"caribe","name":"Habitación Caribe","desc":"Decoración tropical, camas cómodas y un pequeño balcón con vista a los jardines.","price":90,"discount":0,"features":["4 personas","Balcón","2 camas"],"img":"https://i.postimg.cc/BZ54V4G4/image.png"},{"id":"costazul","name":"Habitación Costazul","desc":"Nuestra habitación más solicitada. Amplia, fresca y a pocos pasos de la playa con vista espectacular al mar.","price":120,"discount":0,"features":["5 personas","3 camas + 1 sofá","Cerca playa"],"img":"https://i.postimg.cc/PrZJwF8C/imagen.png"}],"gallery":["https://i.postimg.cc/J0r4Z7C8/imagen.png","https://i.postimg.cc/0Qhhh82M/imagen.png","https://i.postimg.cc/ZK42kBYd/imagen.png","https://i.postimg.cc/bwhjRXg1/imagen.png","https://i.postimg.cc/R06Ryw3s/imagen.png","https://i.postimg.cc/fyNQd5dD/imagen.png"],"events":[]}</script>
+<script type="application/json" id="site-data">{"rooms":[{"id":"coral","name":"Bungalow Coral","desc":"Acogedor bungalow con vista al jardín, ideal para parejas que buscan tranquilidad.","price":60,"discount":0,"features":["2 personas","1 cama","A/C"],"img":"https://placehold.co/600x400/2B1B4D/FFFFFF?text=Bungalow+Coral"},{"id":"aloha","name":"Bungalow Aloha","desc":"Espacioso bungalow, perfecto para desconectar.","price":60,"discount":0,"features":["2-3 personas","A/C"],"img":"https://i.postimg.cc/2S70s9S0/imagen.png"},{"id":"costanera","name":"Cabaña Costanera","desc":"Cabaña de madera con amplios ventanales y vista parcial al mar. Muy luminosa.","price":110,"discount":0,"features":["4 personas","3 camas","Vista al mar"],"img":"https://i.postimg.cc/FKrd8LP7/imagen.png"},{"id":"costasol","name":"Cabaña Costasol","desc":"La cabaña más soleada del complejo, con acceso directo a la zona de piscina.","price":200,"discount":0,"features":["7 personas","Piscina","Cocina"],"img":"https://i.postimg.cc/mgY0C7wC/imagen.png"},{"id":"pacifico","name":"Habitación Pacífico","desc":"Habitación confortable con cama matrimonial y baño privado. Excelente relación calidad-precio.","price":90,"discount":0,"features":["4 personas","2 camas","Baño privado"],"img":"https://placehold.co/600x400/1E3A8A/FFFFFF?text=Habitación+Pacífico"},{"id":"atlantico","name":"Habitación Atlántico","desc":"Habitación luminosa con dos camas individuales, ideal para amigos o compañeros de viaje.","price":90,"discount":0,"features":["4 personas","2 camas","A/C"],"img":"https://i.postimg.cc/d0wShwB4/imagen.png"},{"id":"caribe","name":"Habitación Caribe","desc":"Decoración tropical, camas cómodas y un pequeño balcón con vista a los jardines.","price":90,"discount":0,"features":["4 personas","Balcón","2 camas"],"img":"https://i.postimg.cc/BZ54V4G4/image.png"},{"id":"costazul","name":"Habitación Costazul","desc":"Nuestra habitación más solicitada. Amplia, fresca y a pocos pasos de la playa con vista espectacular al mar.","price":120,"discount":0,"features":["5 personas","3 camas + 1 sofá","Cerca playa"],"img":"https://i.postimg.cc/PrZJwF8C/imagen.png"}],"gallery":["https://i.postimg.cc/J0r4Z7C8/imagen.png","https://i.postimg.cc/0Qhhh82M/imagen.png","https://i.postimg.cc/ZK42kBYd/imagen.png","https://i.postimg.cc/bwhjRXg1/imagen.png","https://i.postimg.cc/R06Ryw3s/imagen.png","https://i.postimg.cc/fyNQd5dD/imagen.png"],"about":["https://i.postimg.cc/wBRGqJGG/imagen.png","https://i.postimg.cc/0Qhhh82M/imagen.png","https://i.postimg.cc/ZK42kBYd/imagen.png","https://i.postimg.cc/bwhjRXg1/imagen.png","https://i.postimg.cc/R06Ryw3s/imagen.png","https://i.postimg.cc/fyNQd5dD/imagen.png","https://i.postimg.cc/J0r4Z7C8/imagen.png","https://i.postimg.cc/FKrd8LP7/imagen.png","https://i.postimg.cc/mgY0C7wC/imagen.png","https://i.postimg.cc/PrZJwF8C/imagen.png"],"events":[]}</script>
 
 <script>
 (function () {
@@ -415,7 +418,9 @@ body.modal-open{overflow:hidden}
   document.getElementById("year").textContent = new Date().getFullYear();
 
   /* ---------- Contenido dinámico ---------- */
+  var DEFAULT_ABOUT = ["https://i.postimg.cc/wBRGqJGG/imagen.png","https://i.postimg.cc/0Qhhh82M/imagen.png","https://i.postimg.cc/ZK42kBYd/imagen.png","https://i.postimg.cc/bwhjRXg1/imagen.png","https://i.postimg.cc/R06Ryw3s/imagen.png","https://i.postimg.cc/fyNQd5dD/imagen.png","https://i.postimg.cc/J0r4Z7C8/imagen.png","https://i.postimg.cc/FKrd8LP7/imagen.png","https://i.postimg.cc/mgY0C7wC/imagen.png","https://i.postimg.cc/PrZJwF8C/imagen.png"];
   var DATA = JSON.parse(document.getElementById("site-data").textContent);
+  if (!Array.isArray(DATA.about)) DATA.about = DEFAULT_ABOUT.slice();
   var $ = function (s) { return document.querySelector(s); };
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
   var money = function (n) { return "$" + (+(+n).toFixed(2)); };
@@ -435,8 +440,24 @@ body.modal-open{overflow:hidden}
       '<div class="room-card__price">' + price + "</div>" + tag + '</div><div class="room-card__body"><h3>' + (ed ? I("name", r.name) : esc(r.name)) + "</h3><p>" + (ed ? I("desc", r.desc) : esc(r.desc)) + "</p>" +
       '<div class="room-card__features">' + feats + '</div><div class="room-card__footer"><div class="room-meta"><b>' + from + "</b>Mín. 1 noche</div>" + btn + "</div></div></div>";
   }
+  /* Muro de ladrillos: filas alternas de 2 ladrillos y de medio+1+medio (cuadrícula de 4 columnas).
+     Si la última fila queda incompleta, el último ladrillo se estira para cerrarla. */
+  function wall(list) {
+    var n = list.length, out = [], i = 0, r = 0;
+    while (i < n) {
+      var pat = r % 2 ? [1, 2, 1] : [2, 2], used = 0;
+      for (var k = 0; k < pat.length && i < n; k++, i++) {
+        var s = (i === n - 1) ? 4 - used : pat[k];
+        used += s;
+        out.push('<div class="brick" style="grid-column:span ' + s + '"><img src="' + img(list[i]) + '" alt="Foto ' + (i + 1) + '" loading="lazy"></div>');
+      }
+      r++;
+    }
+    return out.join("");
+  }
   function render() {
     $("#roomsGrid").innerHTML = DATA.rooms.map(function (r) { return card(r, false); }).join("");
+    $("#aboutWall").innerHTML = wall(DATA.about || []);
     $("#galleryGrid").innerHTML = DATA.gallery.map(function (u, i) { return '<div class="gallery-item"><img src="' + img(u) + '" alt="Foto ' + (i + 1) + '" loading="lazy"></div>'; }).join("");
     $("#eventsGrid").innerHTML = DATA.events.map(function (e) {
       return '<div class="ev-card">' + (e.img ? '<img src="' + img(e.img) + '" alt="' + esc(e.title) + '" loading="lazy">' : "") + '<div><span class="ev-tag">' + (e.type === "corporativo" ? "Corporativo" : "Social") + '</span><h3>' + esc(e.title) + '</h3>' + (e.date ? "<small>" + esc(e.date) + "</small>" : "") + '<p>' + esc(e.desc) + '</p></div></div>';
@@ -444,7 +465,9 @@ body.modal-open{overflow:hidden}
   }
   render();
   var configured = API.indexOf("TU-USUARIO") < 0;
-  if (configured) fetch(API + "/api/site").then(function (r) { return r.json(); }).then(function (d) { if (d && d.rooms) { DATA = d; render(); } }).catch(function () {});
+  if (configured) fetch(API + "/api/site").then(function (r) { return r.json(); }).then(function (d) {
+    if (d && d.rooms) { if (!Array.isArray(d.about)) d.about = DATA.about || DEFAULT_ABOUT.slice(); DATA = d; render(); }
+  }).catch(function () {});
 
   /* ---------- Menú de fotos de cada habitación ---------- */
   var M = $("#roomModal"), mFg = $("#mFg"), mBg = $("#mBg"), mTh = $("#mThumbs"), mCur = [], mI = 0, mLast = null;
@@ -527,7 +550,8 @@ body.modal-open{overflow:hidden}
     }).catch(function () { body.innerHTML = "<p class='err'>No se pudo conectar con el servidor.</p>"; });
   }
   function openPanel() {
-    W = JSON.parse(JSON.stringify(DATA)); S = { tab: "rooms", i: 0, ed: null }; $("#fab").classList.add("on"); show();
+    W = JSON.parse(JSON.stringify(DATA)); if (!Array.isArray(W.about)) W.about = DEFAULT_ABOUT.slice();
+    S = { tab: "rooms", i: 0, ed: null }; $("#fab").classList.add("on"); show();
     foot.innerHTML = '<span id="st" class="muted"></span><span><button class="btn btn--primary" data-act="pub">Publicar cambios</button> <button data-act="out">Cerrar sesión</button></span>';
     P();
   }
@@ -545,9 +569,9 @@ body.modal-open{overflow:hidden}
   });
 
   function P() {
-    var T = [["rooms", "Habitaciones"], ["gallery", "Galería"], ["events", "Eventos"]];
+    var T = [["rooms", "Habitaciones"], ["about", "Nosotros"], ["gallery", "Galería"], ["events", "Eventos"]];
     var h = '<div class="tabs">' + T.map(function (t) { return '<button data-tab="' + t[0] + '" class="' + (S.tab === t[0] ? "on" : "") + '">' + t[1] + "</button>"; }).join("") + "</div>";
-    h += S.tab === "rooms" ? roomsView() : S.tab === "gallery" ? galView() : evView();
+    h += S.tab === "rooms" ? roomsView() : S.tab === "about" ? aboutView() : S.tab === "gallery" ? galView() : evView();
     body.innerHTML = h;
   }
   function roomsView() {
@@ -565,6 +589,11 @@ body.modal-open{overflow:hidden}
       return '<div class="grow"><img src="' + img(u) + '" alt=""><input data-xi="' + i + '" value="' + esc(u) + '" placeholder="https://i.postimg.cc/..."><label class="up">📁<input type="file" accept="image/*" data-up="x:' + i + '" hidden></label><button class="danger" data-act="delx" data-i="' + i + '">🗑</button></div>';
     }).join("") + '<div class="row"><button data-act="addx">+ Añadir foto adicional</button></div>';
     return h + "</div>";
+  }
+  function aboutView() {
+    return '<p class="muted">Fotos del muro de ladrillos en «Sobre nosotros». Se acomodan solas, en orden: 2 ladrillos, luego medio + 1 + medio, y así. Pega un enlace o sube una foto desde tu equipo.</p>' + W.about.map(function (u, i) {
+      return '<div class="grow"><img src="' + img(u) + '" alt=""><input data-ai="' + i + '" value="' + esc(u) + '" placeholder="https://i.postimg.cc/..."><label class="up">📁<input type="file" accept="image/*" data-up="a:' + i + '" hidden></label><button class="danger" data-act="delab" data-i="' + i + '">🗑</button></div>';
+    }).join("") + '<div class="row"><button data-act="addab">+ Añadir foto</button></div>';
   }
   function galView() {
     return '<p class="muted">Pega el enlace de una foto (i.postimg.cc u otro) o sube una desde tu equipo.</p>' + W.gallery.map(function (u, i) {
@@ -593,6 +622,8 @@ body.modal-open{overflow:hidden}
     else if (a === "addtag") { (r.features = r.features || []).push("Nueva etiqueta"); P(); var ts = body.querySelectorAll('[data-inl="feat"]'), last = ts[ts.length - 1]; if (last) { last.focus(); document.execCommand("selectAll", false, null); } }
     else if (a === "addx") { (r.imgs = r.imgs || []).push(""); P(); }
     else if (a === "delx") { r.imgs.splice(+t.dataset.i, 1); P(); }
+    else if (a === "addab") { W.about.push(""); P(); }
+    else if (a === "delab") { W.about.splice(+t.dataset.i, 1); P(); }
     else if (a === "addph") { W.gallery.push(""); P(); }
     else if (a === "delph") { W.gallery.splice(+t.dataset.i, 1); P(); }
     else if (a === "addev") { W.events.push({ id: "e" + Date.now().toString(36), type: "social", title: "Nuevo evento", date: "", desc: "", img: "" }); P(); }
@@ -612,13 +643,14 @@ body.modal-open{overflow:hidden}
       f = t.files[0]; if (!f) return; st("Subiendo imagen…");
       api("/api/upload", { method: "POST", headers: { "Content-Type": f.type }, body: f }).then(function (j) {
         var p = t.dataset.up.split(":");
-        if (p[0] === "room") { W.rooms[S.i].img = j.url; S.ed = null; } else if (p[0] === "x") W.rooms[S.i].imgs[p[1]] = j.url; else if (p[0] === "g") W.gallery[p[1]] = j.url; else W.events[p[1]].img = j.url;
+        if (p[0] === "room") { W.rooms[S.i].img = j.url; S.ed = null; } else if (p[0] === "x") W.rooms[S.i].imgs[p[1]] = j.url; else if (p[0] === "a") W.about[p[1]] = j.url; else if (p[0] === "g") W.gallery[p[1]] = j.url; else W.events[p[1]].img = j.url;
         st("Imagen subida"); P();
       }).catch(function (x) { st(x.message); });
       return;
     }
     var thumb = function () { var g = t.closest(".grow"), im = g && g.querySelector("img"); if (im) im.src = img(t.value.trim()); };
     if (t.dataset.gi !== undefined) { W.gallery[t.dataset.gi] = t.value.trim(); thumb(); }
+    else if (t.dataset.ai !== undefined) { W.about[t.dataset.ai] = t.value.trim(); thumb(); }
     else if (t.dataset.xi !== undefined) { W.rooms[S.i].imgs[t.dataset.xi] = t.value.trim(); thumb(); }
     else if (t.dataset.ev !== undefined) { W.events[t.dataset.ev][t.dataset.k] = t.value; if (t.dataset.k === "img") thumb(); }
   });
