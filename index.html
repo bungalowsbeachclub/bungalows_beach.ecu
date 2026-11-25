@@ -157,6 +157,8 @@ footer{background:var(--secondary);color:rgba(255,255,255,.6);padding:80px 0 30p
 #adm [contenteditable]:hover{outline-color:var(--primary)}
 #adm [contenteditable]:focus{outline:2px solid var(--primary);background:#fffbe6;color:#222}
 #adm [data-inl=desc]{display:block}
+#adm .box button.btn--primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+#adm .box button.btn--primary:hover{background:var(--primary-dark)}
 #adm .addtag{font-size:.75rem;padding:4px 10px;border:1px dashed var(--primary);border-radius:3px;color:var(--primary);cursor:pointer}
 #adm .room-card__img img{cursor:pointer}
 
@@ -615,9 +617,10 @@ body.modal-open{overflow:hidden}
       }).catch(function (x) { st(x.message); });
       return;
     }
-    if (t.dataset.gi !== undefined) { W.gallery[t.dataset.gi] = t.value.trim(); P(); }
-    else if (t.dataset.xi !== undefined) { W.rooms[S.i].imgs[t.dataset.xi] = t.value.trim(); P(); }
-    else if (t.dataset.ev !== undefined) { W.events[t.dataset.ev][t.dataset.k] = t.value; if (t.dataset.k === "img") P(); }
+    var thumb = function () { var g = t.closest(".grow"), im = g && g.querySelector("img"); if (im) im.src = img(t.value.trim()); };
+    if (t.dataset.gi !== undefined) { W.gallery[t.dataset.gi] = t.value.trim(); thumb(); }
+    else if (t.dataset.xi !== undefined) { W.rooms[S.i].imgs[t.dataset.xi] = t.value.trim(); thumb(); }
+    else if (t.dataset.ev !== undefined) { W.events[t.dataset.ev][t.dataset.k] = t.value; if (t.dataset.k === "img") thumb(); }
   });
   function live() {
     var pe = body.querySelector("[data-inl=price]"), de = body.querySelector("[data-inl=discount]"); if (!pe || !de) return;
