@@ -125,6 +125,7 @@ footer{background:var(--secondary);color:rgba(255,255,255,.6);padding:80px 0 30p
 /* ===== PANEL DE EDICIÓN ===== */
 #fab{position:fixed;right:18px;bottom:18px;z-index:200;background:var(--secondary);color:#fff;border:1px solid var(--primary);border-radius:99px;padding:10px 18px;font-size:.8rem;cursor:pointer;opacity:.85;box-shadow:var(--shadow-lg)}
 #fab:hover{opacity:1}
+#fab:not(.on){display:none}
 #adm{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);padding:16px;align-items:center;justify-content:center}
 #adm .box{background:#fff;border-radius:var(--radius);width:100%;max-width:980px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
 #adm .bar,#adm .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 20px;background:var(--bg);flex-wrap:wrap}
@@ -152,6 +153,12 @@ footer{background:var(--secondary);color:rgba(255,255,255,.6);padding:80px 0 30p
 #adm .evr{border:1px solid #e5e7eb;border-radius:8px;padding:14px;margin-bottom:14px;display:grid;gap:8px}
 #adm .err{color:#b91c1c;font-size:.85rem}
 #adm label.l{font-size:.78rem;color:var(--muted)}
+#adm [contenteditable]{outline:1px dashed transparent;outline-offset:2px;border-radius:3px;cursor:text;min-width:14px;display:inline-block}
+#adm [contenteditable]:hover{outline-color:var(--primary)}
+#adm [contenteditable]:focus{outline:2px solid var(--primary);background:#fffbe6;color:#222}
+#adm [data-inl=desc]{display:block}
+#adm .addtag{font-size:.75rem;padding:4px 10px;border:1px dashed var(--primary);border-radius:3px;color:var(--primary);cursor:pointer}
+#adm .room-card__img img{cursor:pointer}
 
 /* ===== MENÚ DE FOTOS (Reservar) ===== */
 body.modal-open{overflow:hidden}
@@ -415,13 +422,16 @@ body.modal-open{overflow:hidden}
 
   var waMsg = function (r) { return "Hola, me interesa reservar " + r.name + " (desde " + money(fin(r)) + "). ¿Me confirman disponibilidad, por favor?"; };
   function card(r, ed) {
-    var E = function (k) { return ed ? ' data-ed="' + k + '"' : ""; };
     var d = r.discount > 0, f = fin(r), multi = (r.imgs || []).filter(Boolean).length > 0;
-    return '<div class="room-card"><div class="room-card__img"' + E("img") + '><img src="' + img(r.img) + '" alt="' + esc(r.name) + '">' +
-      '<div class="room-card__price"' + E("price") + '>' + (d ? "<s>" + money(r.price) + "</s> " + money(f) : money(r.price)) + ' / noche</div>' +
-      (d ? '<div class="disc-tag">-' + r.discount + '%</div>' : "") + '</div><div class="room-card__body"><h3' + E("name") + '>' + esc(r.name) + '</h3><p' + E("desc") + '>' + esc(r.desc) + '</p>' +
-      '<div class="room-card__features"' + E("features") + '>' + (r.features || []).map(function (x) { return "<span>" + esc(x) + "</span>"; }).join("") + '</div>' +
-      '<div class="room-card__footer"><div class="room-meta"><b>Desde ' + money(f) + '</b>Mín. 1 noche</div>' + (multi ? '<button type="button" class="btn btn--primary reserve-btn" data-room="' + esc(r.id) + '">Reservar</button>' : '<a href="https://wa.me/' + WA + '?text=' + encodeURIComponent(waMsg(r)) + '" target="_blank" rel="noopener" class="btn btn--primary">Reservar</a>') + '</div></div></div>';
+    var I = function (k, v, x) { return '<span contenteditable="true" spellcheck="false" data-inl="' + k + '"' + (x || "") + ">" + esc(v) + "</span>"; };
+    var price = ed ? "$" + I("price", r.price) + " / noche" : (d ? "<s>" + money(r.price) + "</s> " + money(f) : money(r.price)) + " / noche";
+    var tag = ed ? '<div class="disc-tag">Desc. -' + I("discount", r.discount || 0) + "%</div>" : (d ? '<div class="disc-tag">-' + r.discount + "%</div>" : "");
+    var feats = (r.features || []).map(function (x, i) { return ed ? I("feat", x, ' data-i="' + i + '"') : "<span>" + esc(x) + "</span>"; }).join("") + (ed ? '<span class="addtag" data-act="addtag">+ etiqueta</span>' : "");
+    var from = ed ? 'Desde <span data-live>' + money(f) + "</span>" : "Desde " + money(f);
+    var btn = multi ? '<button type="button" class="btn btn--primary reserve-btn" data-room="' + esc(r.id) + '">Reservar</button>' : '<a href="https://wa.me/' + WA + '?text=' + encodeURIComponent(waMsg(r)) + '" target="_blank" rel="noopener" class="btn btn--primary">Reservar</a>';
+    return '<div class="room-card"><div class="room-card__img"><img src="' + img(r.img) + '" alt="' + esc(r.name) + '"' + (ed ? ' data-ed="img"' : "") + '>' +
+      '<div class="room-card__price">' + price + "</div>" + tag + '</div><div class="room-card__body"><h3>' + (ed ? I("name", r.name) : esc(r.name)) + "</h3><p>" + (ed ? I("desc", r.desc) : esc(r.desc)) + "</p>" +
+      '<div class="room-card__features">' + feats + '</div><div class="room-card__footer"><div class="room-meta"><b>' + from + "</b>Mín. 1 noche</div>" + btn + "</div></div></div>";
   }
   function render() {
     $("#roomsGrid").innerHTML = DATA.rooms.map(function (r) { return card(r, false); }).join("");
@@ -515,13 +525,21 @@ body.modal-open{overflow:hidden}
     }).catch(function () { body.innerHTML = "<p class='err'>No se pudo conectar con el servidor.</p>"; });
   }
   function openPanel() {
-    W = JSON.parse(JSON.stringify(DATA)); S = { tab: "rooms", i: 0, ed: null }; show();
+    W = JSON.parse(JSON.stringify(DATA)); S = { tab: "rooms", i: 0, ed: null }; $("#fab").classList.add("on"); show();
     foot.innerHTML = '<span id="st" class="muted"></span><span><button class="btn btn--primary" data-act="pub">Publicar cambios</button> <button data-act="out">Cerrar sesión</button></span>';
     P();
   }
-  $("#fab").addEventListener("click", function () {
+  function openEditor() {
     if (!tok) return showAuth();
-    api("/api/me").then(openPanel).catch(function () { tok = ""; localStorage.removeItem("bb_tok"); showAuth(); });
+    api("/api/me").then(openPanel).catch(function () { tok = ""; localStorage.removeItem("bb_tok"); $("#fab").classList.remove("on"); showAuth(); });
+  }
+  $("#fab").addEventListener("click", openEditor);
+  if (tok) $("#fab").classList.add("on");
+  var taps = 0, tapT = 0;
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest(".brand img, .footer-brand img")) return;
+    var now = Date.now(); taps = now - tapT < 1500 ? taps + 1 : 1; tapT = now;
+    if (taps >= 10) { taps = 0; openEditor(); }
   });
 
   function P() {
@@ -535,20 +553,15 @@ body.modal-open{overflow:hidden}
     if (!R.length) return '<p class="muted">No hay habitaciones.</p><div class="row"><button class="btn btn--primary" data-act="addroom">+ Añadir habitación</button></div>';
     S.i = Math.min(S.i, R.length - 1); var r = R[S.i];
     return '<div class="pv"><button class="arr" data-act="prev">‹</button><div class="pvc">' + card(r, true) + '</div><button class="arr" data-act="next">›</button></div>' +
-      '<p class="muted center">' + (S.i + 1) + " / " + R.length + " · toca la foto, el precio, el nombre, la descripción o las etiquetas para editarlos</p>" +
+      '<p class="muted center">' + (S.i + 1) + " / " + R.length + " · toca el nombre, la descripción, el precio, el descuento o una etiqueta para escribir directamente · toca la foto para cambiarla · para quitar una etiqueta, bórrala</p>" +
       (S.ed ? editor(r) : "") + '<div class="row"><button data-act="addroom">+ Añadir habitación</button><button class="danger" data-act="delroom">Eliminar esta habitación</button></div>';
   }
   function editor(r) {
-    var e = S.ed, h = '<div class="ed">';
-    if (e === "price") h += '<label class="l">Precio por noche (USD)</label><input id="e_p" type="number" min="0" step="0.01" value="' + r.price + '"><label class="l">Descuento (%)</label><input id="e_d" type="number" min="0" max="90" value="' + (r.discount || 0) + '"><div class="row"><button class="btn btn--primary" data-act="saveprice">Guardar</button><button data-act="rmdisc">Quitar descuento</button></div>';
-    else if (e === "img") {
-      h += '<label class="l">Foto principal (enlace, por ejemplo i.postimg.cc)</label><input id="e_i" value="' + esc(r.img) + '"><div class="row"><button class="btn btn--primary" data-act="saveimg">Usar enlace</button><label class="up">📁 Subir desde mi equipo<input type="file" accept="image/*" data-up="room" hidden></label></div>';
-      h += '<label class="l">Fotos adicionales (opcional). Si añades al menos una, el botón «Reservar» abrirá un menú con todas las fotos.</label>' + (r.imgs || []).map(function (u, i) {
-        return '<div class="grow"><img src="' + img(u) + '" alt=""><input data-xi="' + i + '" value="' + esc(u) + '" placeholder="https://i.postimg.cc/..."><label class="up">📁<input type="file" accept="image/*" data-up="x:' + i + '" hidden></label><button class="danger" data-act="delx" data-i="' + i + '">🗑</button></div>';
-      }).join("") + '<div class="row"><button data-act="addx">+ Añadir foto adicional</button></div>';
-    }
-    else if (e === "features") h += '<label class="l">Etiquetas separadas por coma</label><input id="e_f" value="' + esc((r.features || []).join(", ")) + '"><div class="row"><button class="btn btn--primary" data-act="savef" data-f="features">Guardar</button></div>';
-    else h += '<label class="l">' + (e === "name" ? "Nombre" : "Descripción") + '</label>' + (e === "desc" ? '<textarea id="e_f" rows="3">' + esc(r.desc) + "</textarea>" : '<input id="e_f" value="' + esc(r.name) + '">') + '<div class="row"><button class="btn btn--primary" data-act="savef" data-f="' + e + '">Guardar</button></div>';
+    var h = '<div class="ed">';
+    h += '<label class="l">Foto principal (enlace, por ejemplo i.postimg.cc)</label><input id="e_i" value="' + esc(r.img) + '"><div class="row"><button class="btn btn--primary" data-act="saveimg">Usar enlace</button><label class="up">📁 Subir desde mi equipo<input type="file" accept="image/*" data-up="room" hidden></label></div>';
+    h += '<label class="l">Fotos adicionales (opcional). Si añades al menos una, el botón «Reservar» abrirá un menú con todas las fotos.</label>' + (r.imgs || []).map(function (u, i) {
+      return '<div class="grow"><img src="' + img(u) + '" alt=""><input data-xi="' + i + '" value="' + esc(u) + '" placeholder="https://i.postimg.cc/..."><label class="up">📁<input type="file" accept="image/*" data-up="x:' + i + '" hidden></label><button class="danger" data-act="delx" data-i="' + i + '">🗑</button></div>';
+    }).join("") + '<div class="row"><button data-act="addx">+ Añadir foto adicional</button></div>';
     return h + "</div>";
   }
   function galView() {
@@ -565,6 +578,7 @@ body.modal-open{overflow:hidden}
   }
 
   adm.addEventListener("click", function (e) {
+    if (e.target.closest("[contenteditable]")) return;
     var t = e.target.closest("[data-act],[data-ed],[data-tab]"); if (!t) { if (e.target.closest("a")) e.preventDefault(); return; }
     var a = t.dataset.act, r = W && W.rooms[S.i], n = W ? W.rooms.length : 0;
     if (t.dataset.tab) { S.tab = t.dataset.tab; S.ed = null; return P(); }
@@ -573,17 +587,15 @@ body.modal-open{overflow:hidden}
     else if (a === "prev" || a === "next") { S.i = (S.i + (a === "next" ? 1 : -1) + n) % n; S.ed = null; P(); }
     else if (a === "addroom") { W.rooms.push({ id: "r" + Date.now().toString(36), name: "Nueva habitación", desc: "Descripción de la habitación.", price: 50, discount: 0, features: ["2 personas"], img: "" }); S.i = W.rooms.length - 1; S.ed = null; P(); }
     else if (a === "delroom") { if (confirm("¿Eliminar esta habitación?")) { W.rooms.splice(S.i, 1); S.i = Math.max(0, S.i - 1); S.ed = null; P(); } }
-    else if (a === "saveprice") { r.price = Math.max(0, +$("#e_p").value || 0); r.discount = Math.min(90, Math.max(0, +$("#e_d").value || 0)); S.ed = null; P(); }
-    else if (a === "rmdisc") { r.discount = 0; S.ed = null; P(); }
     else if (a === "saveimg") { r.img = $("#e_i").value.trim(); S.ed = null; P(); }
+    else if (a === "addtag") { (r.features = r.features || []).push("Nueva etiqueta"); P(); var ts = body.querySelectorAll('[data-inl="feat"]'), last = ts[ts.length - 1]; if (last) { last.focus(); document.execCommand("selectAll", false, null); } }
     else if (a === "addx") { (r.imgs = r.imgs || []).push(""); P(); }
     else if (a === "delx") { r.imgs.splice(+t.dataset.i, 1); P(); }
-    else if (a === "savef") { var v = $("#e_f").value; r[t.dataset.f] = t.dataset.f === "features" ? v.split(",").map(function (x) { return x.trim(); }).filter(Boolean) : v.trim(); S.ed = null; P(); }
     else if (a === "addph") { W.gallery.push(""); P(); }
     else if (a === "delph") { W.gallery.splice(+t.dataset.i, 1); P(); }
     else if (a === "addev") { W.events.push({ id: "e" + Date.now().toString(36), type: "social", title: "Nuevo evento", date: "", desc: "", img: "" }); P(); }
     else if (a === "delev") { if (confirm("¿Eliminar este evento?")) { W.events.splice(+t.dataset.i, 1); P(); } }
-    else if (a === "out") { api("/api/logout", { method: "POST" }).catch(function () {}); tok = ""; localStorage.removeItem("bb_tok"); adm.style.display = "none"; }
+    else if (a === "out") { api("/api/logout", { method: "POST" }).catch(function () {}); tok = ""; localStorage.removeItem("bb_tok"); $("#fab").classList.remove("on"); adm.style.display = "none"; }
     else if (a === "pub") {
       st("Publicando…");
       api("/api/site", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(W) }).then(function (j) {
@@ -606,6 +618,25 @@ body.modal-open{overflow:hidden}
     if (t.dataset.gi !== undefined) { W.gallery[t.dataset.gi] = t.value.trim(); P(); }
     else if (t.dataset.xi !== undefined) { W.rooms[S.i].imgs[t.dataset.xi] = t.value.trim(); P(); }
     else if (t.dataset.ev !== undefined) { W.events[t.dataset.ev][t.dataset.k] = t.value; if (t.dataset.k === "img") P(); }
+  });
+  function live() {
+    var pe = body.querySelector("[data-inl=price]"), de = body.querySelector("[data-inl=discount]"); if (!pe || !de) return;
+    var pr = parseFloat(pe.textContent.replace(",", ".")) || 0, dc = Math.min(90, Math.max(0, Math.round(parseFloat(de.textContent) || 0)));
+    body.querySelectorAll("[data-live]").forEach(function (n) { n.textContent = money(pr * (100 - dc) / 100); });
+  }
+  adm.addEventListener("input", function (e) { var k = e.target.dataset && e.target.dataset.inl; if (k === "price" || k === "discount") live(); });
+  adm.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.dataset && e.target.dataset.inl) { e.preventDefault(); e.target.blur(); } });
+  adm.addEventListener("paste", function (e) {
+    if (e.target.dataset && e.target.dataset.inl) { e.preventDefault(); document.execCommand("insertText", false, (e.clipboardData || window.clipboardData).getData("text").replace(/\s+/g, " ")); }
+  });
+  adm.addEventListener("focusout", function (e) {
+    var t = e.target, k = t.dataset && t.dataset.inl; if (!k || !W) return;
+    var r = W.rooms[S.i], v = t.textContent.trim();
+    if (k === "name") { r.name = v.slice(0, 80) || "Sin nombre"; t.textContent = r.name; }
+    else if (k === "desc") r.desc = v.slice(0, 500);
+    else if (k === "price") { r.price = Math.max(0, parseFloat(v.replace(",", ".")) || 0); t.textContent = r.price; live(); }
+    else if (k === "discount") { r.discount = Math.min(90, Math.max(0, Math.round(parseFloat(v) || 0))); t.textContent = r.discount; live(); }
+    else if (k === "feat") { var i = +t.dataset.i; if (!v) { r.features.splice(i, 1); P(); } else r.features[i] = v.slice(0, 40); }
   });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") adm.style.display = "none"; });
 })();
